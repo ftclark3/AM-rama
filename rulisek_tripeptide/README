@@ -1,0 +1,55 @@
+This directory should contain:
+    *   P-CONF_1.6M.zip (download from https://osf.io/7nwu4/files/osfstorage)
+    *   P-CONF_1.6M directory (unzip P-CONF_1.6M.zip)
+    -       AAA, AAC, etc.
+    *   extract_info_4.py 
+    *   they_said_to_ignore_these.txt
+    *   structures_without_energies.txt 
+    *   make_cmaps.py 
+    *   cmaps directory
+    -       plots directory
+    -       data directory
+
+The directory P-CONF_1.6M contains 8000 directories: one for each tripeptide sequence.
+The tripeptide subdirectories in P-CONF_1.6M contain PDB files representing conformers that are local energy minima.
+The energies of these conformers are given in the header information of the PDB file.
+The meanings of these different energies are given in the paper. 
+
+extract_info_4.py uses MDAnalysis to extract phi and psi dihedral angles from the PDB files.
+It also reads the energies from the headers of the PDB files and writes them, along with the phi and psi angles, to the extracted_info directory
+
+they_said_to_ignore_these.txt contains a list of conformers that should have been excluded from the database (https://osf.io/7nwu4/wiki/home/)
+
+structures_without_energies.txt contains a list of conformers that were not flagged by the authors as ones to ignore but lack energy information in the PDB header.
+
+make_cmaps.py reads the information in the extracted_info directory (created by extract_info_4.py), looping over each sequence.
+It assigns a gaussian well in phi-psi space to each memory conformer for each sequence and sums the gaussian wells to construct an energy surface.
+It then writes this tabulated potential in a form that is compatible with the rama_AM function in the OpenAWSEM code, which uses the OpenMM CMAPTorsionForce
+This script also plots the potential in phi/psi space.
+
+The cmaps directory has a plots subdirectory and a data subdirectory, holding the energy surface plots and numerical data described above.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

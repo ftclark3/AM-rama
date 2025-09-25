@@ -1,0 +1,33 @@
+This directory should contain:
+    *   jp2c04647_si_002.zip (download from https://pubs.acs.org/doi/10.1021/acs.jpcb.2c04647?goto=supporting-info)
+    *   TripeptideConformations directory (unzip jp2c04647_si_002.zip) 
+    *   analysis directory:
+    -       extract_data.py
+
+The TripeptideConformations directory contains the following files:
+    *    a README
+    *    csv files for all tripeptide sequences,
+            except those containing GLY or ALA as the middle residue,
+            but including the histidine ionization states/tautomers,
+            HID (proton at delta position), HIE (proton at epsilon position), 
+            and HIP (doubly protonated ==> positively charged)
+    *    csv files have names like ALA_VAL_ALA_new.csv
+Each row in each CSV represents a different conformer (each being a local minimum on the free energy landscape). 
+The csv files have a variable number of rows.
+Rows (conformers) are sorted in order of increasing free energy.
+Free energy is reported in the first column of each row.
+The free energy of the lowest-free energy conformer is set to 0.
+I think the free energy is in units of kcal/mol, based on Fig. 5 from the paper.
+Other columns in the csv files specify the dihedral angles. 
+The number of columns varies between files because different sequences have different numbers of dihedral angles. 
+The dihedral angles are ordered by residue (so the dihedral angles of the N-terminal residue come first, and so on). 
+Within a given residue, dihedral angles are ordered like this: phi, psi, chi1-5 (if present).  
+So, a row might look like this:
+FREE_ENERGY, PHI(RES 1), PSI(RES 1), CHI1(RES 1), PHI(RES 2), PSI(RES 2), CHI1(RES 2), CHI2(RES 2), PHI(RES 3), PSI(RES 3)
+
+The script analysis/extract_data.py loops over the CSV files in TripeptideConformations and reformats the relevant data from each file into a numpy array, saved to the directory analysis/stats_by_seq. 
+The numpy arrays saved in stats_by_seq have 3 rows and a number of columns equal to the number of conformers sampled for that sequence.
+The first row is the phi angle of the middle residue, the second the psi angle of the middle residue, and the third the free energy of the conformer.
+This script also writes analysis/HID_scatterplot.png and analysis/HIE_scatterplot.png so that the sampled confomers and energies of the two histidine tautomers may be compared.
+As expected, the plots are similar, reassuring us that we can pick either HID or HIE for further analysis.
+
