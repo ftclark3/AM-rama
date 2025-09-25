@@ -1,0 +1,21 @@
+The TripeptideConformations directory contains the following files:
+a README
+csv files for all tripeptide sequences:
+    except those containing GLY or ALA as the middle residue
+    but including HIE, HID, and HIP
+csv files have names like ALA_VAL_ALA_new.csv
+
+The csv files have a variable number of rows. Each row represents a different conformer (specifically, a local minimum)
+that was sampled. The first column in each row is the free energy relative to the lowest free energy conformer that was sampled
+for the given sequence. Conformers are sorted in order of increasing free energy. I think the free energy is in units of kcal/mol,
+because they use those units in Fig. 5 of the paper. Other columns in the row specify the dihedral angles. The dihedral angles
+of each residue are grouped together. The number of columns varies across files because different sequences have different numbers
+of dihedral angles. Within a given residue, dihedral angles are ordered like this: phi, psi, chi1-5 (if present).  
+
+
+Since HIP is charged and openawsem doesn't put charges on histidine, I'm going to ignore the HIP files.
+I'll compare HID results to HIE results. I don't expect them to be dramatically different. see script extract_data.py
+
+The numpy arrays saved in stats_by_seq have 3 rows and a number of columns equal to the number of conformers sampled for that sequence. The first row is the phi angle, the second the psi angle, and the third the energy.
+
+
