@@ -19,12 +19,13 @@ def evaluate_potential(phis, psis, gammas, sigma=np.pi/180, min_energy=10):
     return grid
 
 # setup
+energy_type ='MD_and_water'#'MD_and_octanol'#'MD_and_water'
 if not os.path.exists('cmaps'):
     os.mkdir('cmaps')
-if not os.path.exists('cmaps/data'):
-    os.mkdir('cmaps/data')
-if not os.path.exists('cmaps/plots'):
-    os.mkdir('cmaps/plots')
+if not os.path.exists(f'cmaps/data_{energy_type}'):
+    os.mkdir(f'cmaps/data_{energy_type}')
+if not os.path.exists(f'cmaps/plots_{energy_type}'):
+    os.mkdir(f'cmaps/plots_{energy_type}')
 file_path = "extracted_info"
 seqs = []
 alphabet = "ACDEFGHIKLMNPQRSTVWY"
@@ -32,14 +33,16 @@ for aa1 in alphabet:
     for aa2 in alphabet:
         for aa3 in alphabet:
             seqs.append(f"{aa1}{aa2}{aa3}")
-energy_type ='MD_and_water'#'protein_and_water'
 # data array indices
 #     first word: where the conformers were sampled from
 #     second word: solvent used for dielectric screening and solvent interaction calculation
 energy_type_to_index = {'MD_and_water': 0,
-                        'MD_and_octanol': 1,
-                        'protein_and_water': 2,
-                        'protein_and_octanol': 3}
+                        'MD_and_octanol': 2}
+# I THINK THIS LIST WAS WRONG
+#{'MD_and_water': 0,
+                       # 'MD_and_octanol': 1,
+                       # 'protein_and_water': 2,
+                       # 'protein_and_octanol': 3}
 
 # load angles and energies for each position (second to second-to-last residues, considering self and nearest neighbors)
 phi_by_seq= []
@@ -51,11 +54,12 @@ for seq in seqs:
     phi_angles = data[:,4]*np.pi/180
     psi_angles = data[:,5]*np.pi/180
     gammas = data[:,energy_type_to_index[energy_type]]    
+    breakpoint()
     # there are a lot of regions on the ramachandran plot that we didn't sample
     #     these regions probably tend to be about as high in energy as the highest-energy conformer we sampled
     #     but we don't explicitly account for unsampled regions
     #     so we'll set the energy of the highest-energy sampled conformer to 0, and reference everything to that
-    #     so that everything we've sampled can be given a favorable gaussian well where the depth is determined by the energy of the conformer
+    #     so that everything we've sampled can be given a favorable gaussian well where the depth is determined by the energy of the conformer 
     gammas -= np.max(gammas)
     # now we add our info for the current structure to our big list of info for all structures
     phi_by_seq.append(phi_angles)
@@ -78,7 +82,7 @@ def loop_body(phis, psis, gammas, seq):
     ax.set_xticks([0, 22.5, 45, 67.5, 90,],labels=[-180,-90,0,90,180])#plt.xticks([0, 90, 180, 270, 360],labels=[-180,-90,0,90,180])
     ax.set_yticks([0, 22.5, 45, 67.5, 90,],labels=[-180,-90,0,90,180])#plt.yticks([0, 90, 180, 270, 360],labels=[-180,-90,0,90,180])
     ax.set_title(f"Energy vs. phi/psi for {seq[1]}\n in context {seq}")#plt.title(f"Energy vs. phi/psi for {seq[1]}\n in context {seq}")
-    fig.savefig(f'cmaps/plots/{seq}.png',bbox_inches='tight')#plt.savefig(f'cmaps/plots/{seq}.png',bbox_inches='tight')
+    fig.savefig(f'cmaps/plots_{energy_type}/{seq}.png',bbox_inches='tight')#plt.savefig(f'cmaps/plots/{seq}.png',bbox_inches='tight')
     plt.close(fig) # this is the command to close the figure
     # 
     # openmm wants the array to go from 0 to 2pi, but currently it goes from -pi to pi, so we have to fix that
@@ -100,7 +104,7 @@ def loop_body(phis, psis, gammas, seq):
                                    # so we should flatten our array such that phi varies within blocks of length size
                                    # and psi varies between blocks of length size. This requires flattening our array
                                    # in column-major ("F", for "fortran") order
-    np.save(f'cmaps/data/{seq}.npy', grid)
+    np.save(f'cmaps/data_{energy_type}/{seq}.npy', grid)
     
 #for phis, psis, gammas, seq in zip(phi_by_seq, psi_by_seq, gammas_by_seq, seqs):
 #    loop_body(phis, psis, gammas, seq)
